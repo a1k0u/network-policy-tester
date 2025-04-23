@@ -1,0 +1,58 @@
+# apiVersion: test.netpolicies.io/v1
+# kind: Test
+# metadata:
+#   name: test
+settings:
+  policies:
+  - file1.yaml
+  - file2.yaml
+  pods_ip_range: "10.103.0.0/24" # (optional)
+
+namespaces: # (optional), default namespaces without labels
+- name: web
+  labels:
+    app: web
+- name: db
+  labels:
+    app: db
+
+pods:
+- name: nexus
+  namespace: web
+  labels: # (optional)
+    app: nexus
+  ports: # (optional) 80 tcp default
+  - name: http # (optional)
+    protocol: tcp # (optional) tcp default
+    port: 8080
+  # ip: (optional) default from ip range
+- name: wordpress
+  namespace: web
+- name: mysql
+  namespace: web
+
+tests:
+- name: ... # (optional) maybe empty
+  policies: # (optional) policies applied
+  - some_policy_name_0
+  - some_policy_name_1
+  connections:
+  - name: ... # (optional) maybe empty
+    from:
+      pod: nexus
+      port: 8080 # (optional) the first port
+    to:
+      pod: mysql
+    result: allowed
+  - from:
+      address: 103.20.30.40
+      # port: 80 (optional) 80 default
+    to:
+      pod: mysql
+    result: denied
+  - from:
+      pod: wordpress
+    to:
+      address: github.com
+      port: 80
+    result: allowed
