@@ -1,0 +1,5 @@
+{{- range .Servers }}
+{ while true; do echo "{{ $.Name }}:{{ .Protocol }}:{{ .Port }}" | nc -l {{- if eq .Protocol "udp" }} -u {{- end }} -p {{ .Port }}; done } &
+{{- end }}
+
+cat
